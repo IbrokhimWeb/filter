@@ -9,7 +9,7 @@ import { CiLocationOn, CiViewList } from "react-icons/ci";
 import { FiSave } from "react-icons/fi";
 import { v4 } from "uuid";
 
-const Cards = memo(({ search, data }: any) => {
+const Cards = memo(({ reload, search, data }: any) => {
   const hanldeDownload = async () => {
     try {
       await fetch(data?.file).then((response) => {
@@ -67,7 +67,7 @@ const Cards = memo(({ search, data }: any) => {
           </Div>
           <Space />
           <Description id="content" className="max-[400px]:text-[.80rem]">
-            {search?.length
+            {search?.length && reload > 1
               ? data?.about_text
                   .replace(
                     new RegExp(search, "gi"),

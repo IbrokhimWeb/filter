@@ -7,13 +7,14 @@ import { SelectChangeEvent } from "@mui/material";
 import { InputAdornment } from "@mui/material";
 import { Pagination } from "@mui/material";
 import { CircularProgress } from "@mui/material";
-import { Description, Main, Section, Space } from "../../style";
+import { Description, Main, Section, Space, Title } from "../../style";
 
 import { HomeFilterType } from "../../static/types";
 import countrys from "../../static/countrys.json";
 import regions from "../../static/regions.json";
 
 import { TbFilter } from "react-icons/tb";
+import { VscEmptyWindow } from "react-icons/vsc";
 import { BsSearch } from "react-icons/bs";
 const Cards = lazy(() => import(`../../components/cards`));
 import $axios from "../../axios";
@@ -22,6 +23,7 @@ import { v4 } from "uuid";
 const Home = () => {
   const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>("");
+  const [loader, setLoader] = useState<boolean>(false);
   console.log(search);
   const [reload, setReload] = useState<number>(1);
   const [data, setData] = useState<any>(null);
@@ -35,14 +37,17 @@ const Home = () => {
 
   useEffect(() => {
     (async () => {
+      setLoader(true);
       try {
         const res = await $axios.get(
           `/files/?page=${page}&search=${search}&country=${filter?.country}&region=${filter?.region}&organ=${filter?.organ}&file_date=${filter?.file_date}&ordering=${filter?.ordering}`
         );
         setData(res?.data);
         console.log(res);
+        setLoader(false);
       } catch (err) {
         console.error(err);
+        setLoader(false);
       }
     })();
   }, [page, filter, reload]);
@@ -198,11 +203,25 @@ const Home = () => {
           </Section>
 
           <Space />
-          <Section className="w-full min-h-[50vh]">
-            {data?.results.map((el: any) => (
-              <Cards key={v4()} search={search} data={el} />
-            ))}
-          </Section>
+          {loader ? (
+            <Main className="w-full min-h-[50vh] flex items-center justify-center">
+              <CircularProgress color="warning" />
+            </Main>
+          ) : (
+            <Section className="w-full min-h-[50vh]">
+              {data?.results?.length ? (
+                data?.results.map((el: any) => (
+                  <Cards key={v4()} reload={reload} search={search} data={el} />
+                ))
+              ) : (
+                <Main className="w-full min-h-[50vh] flex flex-col items-center justify-center">
+                  <VscEmptyWindow className="text-[5rem] text-gray-400" />
+                  <Space />
+                  <Title className="text-gray-400">Sqahifa Bo'sh</Title>
+                </Main>
+              )}
+            </Section>
+          )}
 
           <Space />
           <Section className="w-full flex justify-center">
