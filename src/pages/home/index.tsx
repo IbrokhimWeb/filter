@@ -70,6 +70,7 @@ const Home = () => {
             placeholder="Sök efter protokoll..."
             variant="standard"
             color="warning"
+            value={search}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -84,7 +85,9 @@ const Home = () => {
             size="large"
             variant="contained"
             color="warning"
-            onClick={() => setReload((prev: number) => prev + 1)}
+            onClick={() => {
+              setReload((prev: number) => prev + 1);
+            }}
           >
             Sök
           </Button>
@@ -156,15 +159,16 @@ const Home = () => {
           <Button
             variant="outlined"
             color="warning"
-            onClick={() =>
+            onClick={() => {
               setFilter({
                 country: "Välj län",
                 region: "Välj län",
                 organ: "Välj beslutande organ",
                 file_date: "Välj år",
                 ordering: "file_date",
-              })
-            }
+              });
+              setSearch("");
+            }}
             className="capitalize max-[1250px]:hidden"
           >
             Rensa filtrering
