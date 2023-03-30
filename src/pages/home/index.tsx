@@ -10,37 +10,42 @@ import { CircularProgress } from "@mui/material";
 import { Description, Main, Section, Space } from "../../style";
 
 import { HomeFilterType } from "../../static/types";
+import countrys from "../../static/countrys.json";
+import regions from "../../static/regions.json";
 
 import { TbFilter } from "react-icons/tb";
 import { BsSearch } from "react-icons/bs";
-import Cards from "../../components/cards";
-const Cqards = lazy(() => import(`../../components/cards`));
+const Cards = lazy(() => import(`../../components/cards`));
 import $axios from "../../axios";
 import { v4 } from "uuid";
 
 const Home = () => {
   const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>("");
+  console.log(search);
+  const [reload, setReload] = useState<number>(1);
   const [data, setData] = useState<any>(null);
   const [filter, setFilter] = useState<HomeFilterType>({
     country: "Välj län",
     region: "Välj län",
     organ: "Välj beslutande organ",
     file_date: "Välj år",
-    ordering: "Sortera på relevans",
+    ordering: "file_date",
   });
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await $axios.get(`/files/?page=${page}`);
+        const res = await $axios.get(
+          `/files/?page=${page}&search=${search}&country=${filter?.country}&region=${filter?.region}&organ=${filter?.organ}&file_date=${filter?.file_date}&ordering=${filter?.ordering}`
+        );
         setData(res?.data);
         console.log(res);
       } catch (err) {
         console.error(err);
       }
     })();
-  }, [page]);
+  }, [page, filter, reload]);
 
   const handleChange = ({ target }: SelectChangeEvent<string>) => {
     setFilter((prev: HomeFilterType) => ({
@@ -75,7 +80,12 @@ const Home = () => {
             onChange={(e) => setSearch(e.target.value)}
             className="w-full"
           />
-          <Button size="large" variant="contained" color="warning">
+          <Button
+            size="large"
+            variant="contained"
+            color="warning"
+            onClick={() => setReload((prev: number) => prev + 1)}
+          >
             Sök
           </Button>
         </Section>
@@ -86,39 +96,62 @@ const Home = () => {
           <Select
             size="small"
             color="warning"
-            value={filter?.country}
+            value={filter?.country == "" ? "Salom" : filter?.country}
             name="country"
             onChange={handleChange}
             className="min-w-[200px] bg-white text-[.8rem]"
           >
-            <MenuItem value={filter?.country}>{filter?.country}</MenuItem>
+            <MenuItem value={"Välj län"}>Välj län</MenuItem>
+            {Object.entries(countrys)?.map((e) => (
+              <MenuItem key={v4()} value={e[0]}>
+                {e[1]}
+              </MenuItem>
+            ))}
           </Select>
           <Select
             size="small"
             color="warning"
-            value={filter?.country}
+            name="region"
+            value={filter?.region}
             onChange={handleChange}
             className="min-w-[200px] bg-white text-[.8rem]"
           >
-            <MenuItem value={filter?.region}>{filter?.region}</MenuItem>
+            <MenuItem value={"Välj län"}>Välj län</MenuItem>
+            {Object.entries(regions)?.map((e) => (
+              <MenuItem key={v4()} value={e[0]}>
+                {e[1]}
+              </MenuItem>
+            ))}
           </Select>
           <Select
             size="small"
             color="warning"
+            name="organ"
             value={filter?.organ}
             onChange={handleChange}
             className="min-w-[200px] bg-white text-[.8rem]"
           >
-            <MenuItem value={filter?.organ}>{filter?.organ}</MenuItem>
+            <MenuItem value={"Välj beslutande organ"}>
+              Välj beslutande organ
+            </MenuItem>
+            <MenuItem value={"s"}>kommunstyrelsen</MenuItem>
+            <MenuItem value={"f"}>kommunfullmäktige</MenuItem>
           </Select>
           <Select
             size="small"
             color="warning"
+            name="file_date"
             value={filter?.file_date}
             onChange={handleChange}
             className="min-w-[200px] bg-white text-[.8rem]"
           >
-            <MenuItem value={filter?.file_date}>{filter?.file_date}</MenuItem>
+            <MenuItem value={"Välj år"}>Välj år</MenuItem>
+            <MenuItem value={"2023"}>2023</MenuItem>
+            <MenuItem value={"2022"}>2022</MenuItem>
+            <MenuItem value={"2021"}>2021</MenuItem>
+            <MenuItem value={"2020"}>2020</MenuItem>
+            <MenuItem value={"2019"}>2019</MenuItem>
+            <MenuItem value={"2018"}>2018</MenuItem>
           </Select>
           <Button
             variant="outlined"
@@ -129,7 +162,7 @@ const Home = () => {
                 region: "Välj län",
                 organ: "Välj beslutande organ",
                 file_date: "Välj år",
-                ordering: "Sortera på relevans",
+                ordering: "file_date",
               })
             }
             className="capitalize max-[1250px]:hidden"
@@ -149,25 +182,22 @@ const Home = () => {
               }
               size="small"
               color="warning"
+              name="ordering"
               value={filter?.ordering}
+              defaultValue="Sortera på relevans"
               onChange={handleChange}
               className="min-w-[200px] max-[1250px]:hidden"
             >
-              <MenuItem value={filter?.ordering}>{filter?.ordering}</MenuItem>
+              <MenuItem value={"file_date"}>Sortera på relevans</MenuItem>
+              <MenuItem value={"-file_date"}>-file_date</MenuItem>
             </Select>
           </Section>
 
           <Space />
           <Section className="w-full min-h-[50vh]">
-            {data?.results
-              ?.filter((e: any) =>
-                e.about_text
-                  .toLocaleLowerCase()
-                  .includes(search.toLocaleLowerCase())
-              )
-              .map((el: any) => (
-                <Cards key={v4()} data={el} />
-              ))}
+            {data?.results.map((el: any) => (
+              <Cards key={v4()} search={search} data={el} />
+            ))}
           </Section>
 
           <Space />

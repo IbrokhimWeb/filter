@@ -1,0 +1,23 @@
+{
+    "nor": "blekinge",
+    "ble": "dalarna",
+    "dal": "gotland",
+    "got": "gävleborg",
+    "gav": "halland",
+    "hal": "jämtland",
+    "jam": "jönköping",
+    "jon": "kalmar",
+    "kal": "kronoberg",
+    "kro": "norrbotten",
+    "ska": "skåne",
+    "sto": "stockholm",
+    "sod": "södermanland",
+    "upp": "uppsala",
+    "var": "värmland",
+    "vab": "västerbotten",
+    "van": "västernorrland",
+    "vam": "västmanland",
+    "vag": "västra götaland",
+    "ore": "örebro",
+    "ost": "östergötland"
+}
